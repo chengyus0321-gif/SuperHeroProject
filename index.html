@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>今日校园运势 · Future Guardians High</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --cream: #F7F3EC;
+    --ink: #1a1714;
+    --ink-soft: #5a534d;
+    --ink-faint: #9c9188;
+    --accent: #C84B2F;
+    --accent-soft: #f0e0da;
+    --gold: #B8922A;
+    --border: rgba(26,23,20,0.12);
+    --card-bg: #FFFFFF;
+    --radius: 12px;
+  }
+
+  body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    padding: 0;
+    /* subtle paper texture */
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  }
+
+  /* ── header ── */
+  .header {
+    text-align: center;
+    padding: 3rem 1.5rem 2rem;
+    position: relative;
+  }
+  .school-label {
+    font-size: 10px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+  }
+  .site-title {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(2rem, 6vw, 3rem);
+    font-weight: 400;
+    line-height: 1.1;
+    color: var(--ink);
+    margin-bottom: 6px;
+  }
+  .site-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .site-sub {
+    font-size: 12px;
+    color: var(--ink-faint);
+    letter-spacing: 0.05em;
+  }
+  .date-pill {
+    display: inline-block;
+    margin-top: 14px;
+    border: 0.5px solid var(--border);
+    border-radius: 999px;
+    padding: 4px 14px;
+    font-size: 11px;
+    color: var(--ink-soft);
+    background: rgba(255,255,255,0.6);
+  }
+
+  /* ── main area ── */
+  .main {
+    max-width: 460px;
+    margin: 0 auto;
+    padding: 0 1.25rem 4rem;
+  }
+
+  /* ── draw card ── */
+  .draw-card {
+    background: var(--card-bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2.5rem 2rem;
+    text-align: center;
+    margin-bottom: 1.25rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .draw-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    border-radius: 50%;
+    background: var(--accent-soft);
+    opacity: 0.5;
+  }
+  .bb-glyph {
+    font-size: 56px;
+    line-height: 1;
+    margin-bottom: 1rem;
+    display: block;
+    animation: wobble 3s ease-in-out infinite;
+  }
+  @keyframes wobble {
+    0%,100% { transform: rotate(-3deg); }
+    50% { transform: rotate(3deg); }
+  }
+  .draw-hint {
+    font-size: 14px;
+    color: var(--ink-soft);
+    line-height: 1.9;
+    margin-bottom: 1.75rem;
+  }
+  .draw-hint strong {
+    color: var(--ink);
+    font-weight: 500;
+  }
+  .draw-btn {
+    background: var(--ink);
+    color: var(--cream);
+    border: none;
+    border-radius: 999px;
+    padding: 11px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 400;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.15s;
+    position: relative;
+    z-index: 1;
+  }
+  .draw-btn:hover { background: #333; }
+  .draw-btn:active { transform: scale(0.97); }
+
+  /* ── results ── */
+  .results { display: none; }
+  .results.visible { display: block; }
+
+  .result-card {
+    background: var(--card-bg);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.1rem 1.25rem;
+    margin-bottom: 10px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+  }
+  .result-card.shown { opacity: 1; transform: none; }
+
+  .card-icon {
+    width: 34px;
+    height: 34px;
+    border-radius: 8px;
+    background: var(--accent-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 15px;
+    color: var(--accent);
+  }
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 4px;
+  }
+  .card-text {
+    font-size: 13.5px;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+  .status-tag {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 10px;
+    border-radius: 999px;
+    margin-top: 6px;
+    font-weight: 500;
+  }
+  .tag-warn { background: #FEF3CD; color: #92600A; }
+  .tag-ok { background: #DFF0D8; color: #2E6B2E; }
+
+  /* ── bottom bar ── */
+  .bottom-bar {
+    text-align: center;
+    margin-top: 1.75rem;
+    padding-top: 1.25rem;
+    border-top: 0.5px solid var(--border);
+  }
+  .btn-outline {
+    background: transparent;
+    border: 0.5px solid var(--border);
+    border-radius: 999px;
+    padding: 8px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: border-color 0.15s, color 0.15s;
+    margin: 0 4px;
+  }
+  .btn-outline:hover { border-color: var(--ink); color: var(--ink); }
+  .cooldown {
+    font-size: 11px;
+    color: var(--ink-faint);
+    margin-top: 10px;
+  }
+
+  /* ── divider ── */
+  .divider {
+    text-align: center;
+    margin: 1.5rem 0;
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: 18px;
+    color: var(--gold);
+    letter-spacing: 0.1em;
+  }
+
+  /* ── footer ── */
+  .footer {
+    text-align: center;
+    padding: 2rem 1rem;
+    font-size: 11px;
+    color: var(--ink-faint);
+    letter-spacing: 0.05em;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="school-label">Future Guardians High · Harborside City</div>
+  <h1 class="site-title">今日<em>校园运势</em></h1>
+  <div class="site-sub">bb人特别版 &middot; 每日限抽一次</div>
+  <div class="date-pill" id="dateDisplay"></div>
+</div>
+
+<div class="main">
+
+  <div class="draw-card" id="drawCard">
+    <span class="bb-glyph">🫧</span>
+    <p class="draw-hint">
+      还在为<strong>单身</strong>苦恼吗？<br>
+      或者有些<strong>成长中的小困惑</strong>？<br>
+      <span style="color:var(--ink-faint); font-size:13px;">抽签也许会给你带来一点灵感——</span>
+    </p>
+    <button class="draw-btn" onclick="draw()">摇一摇签筒</button>
+  </div>
+
+  <div class="results" id="results">
+    <div class="result-card" id="c1">
+      <div class="card-icon">✦</div>
+      <div>
+        <div class="card-label">今日整体运势</div>
+        <div class="card-text" id="t1"></div>
+      </div>
+    </div>
+    <div class="result-card" id="c2">
+      <div class="card-icon">◈</div>
+      <div>
+        <div class="card-label">今日事件预报</div>
+        <div class="card-text" id="t2"></div>
+      </div>
+    </div>
+    <div class="result-card" id="c3">
+      <div class="card-icon">⚡</div>
+      <div>
+        <div class="card-label">能力状态</div>
+        <div class="card-text" id="t3"></div>
+        <span class="status-tag" id="tag3"></span>
+      </div>
+    </div>
+    <div class="result-card" id="c4">
+      <div class="card-icon">✉</div>
+      <div>
+        <div class="card-label">今日忠告</div>
+        <div class="card-text" id="t4"></div>
+      </div>
+    </div>
+
+    <div class="bottom-bar">
+      <button class="btn-outline" onclick="reset()">重新摇签</button>
+      <div class="cooldown">同一天内结果不变 · 明天解锁新运势</div>
+    </div>
+  </div>
+
+  <div class="divider">· fgh ·</div>
+
+</div>
+
+<div class="footer">Future Guardians High &nbsp;/&nbsp; Harborside City &nbsp;/&nbsp; bb人诅咒解除进度：未知</div>
+
+<script>
+/* ============================================================
+   📌 题库 — 直接在这里修改文字，每条用引号包裹，逗号分隔
+   ============================================================ */
+
+const POOL = {
+
+  // 今日整体运势 — 管基调，语气轻松模糊
+  overall: [
+    "今天的你格外引人注目——不确定是好事，但海狸校长看起来又瘦了一点",
+    "低调行事。你今天自带主角光环，最好别在走廊太晃",
+    "今天是平静的一天。平静到有点可疑",
+    "命运今天对你略有偏爱——虽然bb人的手拿不住好运签，但它确实掉进你口袋了",
+    "今天有什么事会出乎你的意料，好的那种。可能和真爱有关，也可能只是食堂换菜单了",
+    "运势一般，不过以bb人的身高，至少今天没人注意到你脸上的表情",
+    "今天适合社交。鼓起勇气——圆圆的外表挡不住内在魅力",
+    "今天有人在想你。具体是谁，签筒也不知道",
+  ],
+
+  // 今日事件预报 — 具体场景，社团/情侣/偶遇/可疑动静
+  event: [
+    "路过音乐室，乐队正在排练，旋律相当好听，你在门口站了比预想中久很多",
+    "午餐时间，你会在转角遇到一对正比情侣，气氛相当甜蜜。你的bb人小身体不知道该往哪站",
+    "放学路上有人拦住你，自我介绍是健身社的，眼神非常真诚，手臂非常有力",
+    "今天DND社在走廊公开跑团，你路过的时候被塞了一张角色卡，对方说"你天生就是这个职业"",
+    "超级演绎会的人从走廊经过，衣服华丽得不像上学，你多看了两眼，对方也回头看了你",
+    "宿舍楼某个方向传来一点可疑的动静，来源不明，建议假装没听见",
+    "一个棕色头发和一个黑色头发的人又去买冰激淋了，你恰好经过，他们问你要不要一起。以bb人的手，拿甜筒会有点挑战",
+    "今天在走廊遇到一个像玫瑰一样的人，和你对视了一秒，然后转身走了",
+    "机械社的人带着零件经过，其中一个滚到你脚边。以bb人的身高，捡起来相当费劲",
+    "食物警察社今天在走廊设点，你口袋里恰好有一块巧克力小笼包",
+  ],
+
+  // 能力状态 — 专注能力本身，可结合bb人身体
+  ability: [
+    { text: "稳定性：岌岌可危。bb人的小手本来就拿不稳东西，今天能力也开始凑热闹了", tag: "tag-warn", label: "不稳定" },
+    { text: "稳定性：出奇地好。也许三头身体型反而解放了什么，今天可以比平时多用20%", tag: "tag-ok",   label: "状态良好" },
+    { text: "稳定性：正常范围，但有60%概率在最需要的时候突然罢工",                    tag: "tag-warn", label: "一般" },
+    { text: "稳定性：超常发挥，原因不明。不建议深究，享受就好",                         tag: "tag-ok",   label: "超常" },
+    { text: "稳定性：能力今天好像在和你对着干。反派的诅咒可能有后续",                  tag: "tag-warn", label: "建议躺平" },
+    { text: "稳定性：完全正常。在全校都是bb人的情况下，这已经是最好的结果了",          tag: "tag-ok",   label: "正常" },
+    { text: "稳定性：今天能力有轻微的创作冲动，说不定画出来的反派if会格外好看",        tag: "tag-ok",   label: "灵感模式" },
+  ],
+
+  // 今日忠告 — 建议/警告，语气荒唐或神秘
+  advice: [
+    "不要在走廊奔跑。尤其是你。bb人重心不稳",
+    "检查你的locker。如果里面有传单，先深呼吸再看",
+    "今天不适合做重大决定。或者做了也行，反正你也不会听的",
+    "水果披萨、巧克力小笼包、香菜汁——今天这三样都不要碰。理由你懂的",
+    "有些话说出口就收不回来了。今天尤其如此。八卦社团效率很高的",
+    "相信你的直觉。除非你的直觉上次让海狸校长又瘦了一圈",
+    "真爱不会从天而降——但locker里的纸条有时候会。值得期待",
+    "今天适合画画。把你的反派if画出来，说不定会有人主动来搭话",
+  ],
+
+};
+
+/* ============================================================
+   逻辑部分 — 不需要改动
+   ============================================================ */
+
+function pick(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+// 每天固定种子，同一天结果不变
+function seedRandom(seed) {
+  let s = seed;
+  return function() {
+    s = (s * 1664525 + 1013904223) & 0xffffffff;
+    return (s >>> 0) / 0xffffffff;
+  };
+}
+
+function getTodaySeed() {
+  const d = new Date();
+  return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+}
+
+function pickSeeded(arr, rng) {
+  return arr[Math.floor(rng() * arr.length)];
+}
+
+function draw() {
+  const rng = seedRandom(getTodaySeed());
+  const overall = pickSeeded(POOL.overall, rng);
+  const event   = pickSeeded(POOL.event,   rng);
+  const ability = pickSeeded(POOL.ability, rng);
+  const advice  = pickSeeded(POOL.advice,  rng);
+
+  document.getElementById('t1').textContent = overall;
+  document.getElementById('t2').textContent = event;
+  document.getElementById('t3').textContent = ability.text;
+  const tag = document.getElementById('tag3');
+  tag.textContent = ability.label;
+  tag.className = 'status-tag ' + ability.tag;
+  document.getElementById('t4').textContent = advice;
+
+  document.getElementById('drawCard').style.display = 'none';
+  const results = document.getElementById('results');
+  results.classList.add('visible');
+
+  ['c1','c2','c3','c4'].forEach((id, i) => {
+    setTimeout(() => document.getElementById(id).classList.add('shown'), i * 220);
+  });
+}
+
+function reset() {
+  document.getElementById('results').classList.remove('visible');
+  ['c1','c2','c3','c4'].forEach(id => document.getElementById(id).classList.remove('shown'));
+  document.getElementById('drawCard').style.display = 'block';
+}
+
+// 日期显示
+(function() {
+  const d = new Date();
+  const days = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+  document.getElementById('dateDisplay').textContent =
+    `${d.getFullYear()}年${d.getMonth()+1}月${d.getDate()}日 ${days[d.getDay()]}`;
+})();
+</script>
+</body>
+</html>
